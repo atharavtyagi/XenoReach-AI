@@ -88,7 +88,8 @@ const connectDB = async () => {
     }
   } catch (err) {
     console.error('❌ MongoDB connection failed:', err.message);
-    process.exit(1);
+    // Wait 500ms before exiting so Render has time to print the log
+    setTimeout(() => process.exit(1), 500);
   }
 };
 
