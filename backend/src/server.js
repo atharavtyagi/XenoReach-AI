@@ -85,7 +85,13 @@ app.use((err, req, res, next) => {
 // Database connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/xenoreach');
+    let uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/xenoreach';
+    // Remove any accidental spaces or quotes from the Render environment variable
+    uri = uri.trim().replace(/^['"]|['"]$/g, '');
+    console.log('🔗 Attempting MongoDB connection...');
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 15000,
+    });
     console.log('✅ MongoDB connected successfully');
 
     // Auto-seed on first launch
