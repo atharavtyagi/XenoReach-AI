@@ -104,14 +104,11 @@ const connectDB = async () => {
     }
   } catch (err) {
     console.error('❌ MongoDB connection failed:', err.message);
-    // Wait 500ms before exiting so Render has time to print the log
-    setTimeout(() => process.exit(1), 500);
   }
 };
 
 const PORT = process.env.PORT || 5000;
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 XenoReach CRM Backend running on http://localhost:${PORT}`);
-  });
+app.listen(PORT, () => {
+  console.log(`🚀 XenoReach CRM Backend running on http://localhost:${PORT}`);
+  connectDB();
 });
