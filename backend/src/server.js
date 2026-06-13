@@ -107,8 +107,15 @@ const connectDB = async () => {
   }
 };
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 XenoReach CRM Backend running on http://localhost:${PORT}`);
-  connectDB();
-});
+// Connect to DB immediately for serverless compatibility
+connectDB();
+
+// Only listen on a port if not running in a Vercel serverless environment
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 XenoReach CRM Backend running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
