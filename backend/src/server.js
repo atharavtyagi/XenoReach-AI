@@ -88,7 +88,8 @@ const connectDB = async () => {
     let uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/xenoreach';
     // Remove any accidental spaces or quotes from the Render environment variable
     uri = uri.trim().replace(/^['"]|['"]$/g, '');
-    console.log('🔗 Attempting MongoDB connection...');
+    const maskedUri = uri.replace(/\/\/[^:]+:[^@]+@/, '//***:***@');
+    console.log('🔗 Attempting MongoDB connection with URI:', maskedUri);
     await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 15000,
     });
