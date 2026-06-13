@@ -52,6 +52,16 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(morgan('dev'));
 
+// Basic Health Check Route for Diagnostics
+app.get('/api/health', (req, res) => {
+  const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/xenoreach';
+  res.json({
+    status: 'ok',
+    vercel: !!process.env.VERCEL,
+    mongoUri: uri.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')
+  });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/customers', customerRoutes);
