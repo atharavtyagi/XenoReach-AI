@@ -1,3 +1,12 @@
+process.on('uncaughtException', (err) => {
+  console.error('🔥 UNCAUGHT EXCEPTION:', err);
+  setTimeout(() => process.exit(1), 500);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🔥 UNHANDLED REJECTION:', reason);
+  setTimeout(() => process.exit(1), 500);
+});
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
