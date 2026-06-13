@@ -102,6 +102,7 @@ const connectDB = async () => {
     console.log('🔗 Attempting MongoDB connection with URI:', maskedUri);
     await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 15000,
+      family: 4,
     });
     console.log('✅ MongoDB connected successfully');
 
