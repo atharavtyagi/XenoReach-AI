@@ -153,7 +153,7 @@ router.post('/:id/launch', async (req, res) => {
     }
 
     const customers = await Customer.find({ _id: { $in: segment.customerIds } })
-      .select('name email phone preferredChannel').lean();
+      .select('name email phone preferredChannel pushSubscription').lean();
 
     // Create communication records
     const communications = await Communication.insertMany(
@@ -186,6 +186,7 @@ router.post('/:id/launch', async (req, res) => {
         customerId: customers[i]._id,
         customerName: customers[i].name,
         email: customers[i].email,
+        pushSubscription: customers[i].pushSubscription,
         message: campaign.message,
       })),
     };

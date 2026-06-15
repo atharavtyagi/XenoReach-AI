@@ -1,8 +1,9 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import {
   ArrowLeft, Mail, Phone, MapPin, ShoppingBag, TrendingUp,
-  Sparkles, Calendar, Tag, Loader2, RefreshCw,
+  Sparkles, Calendar, Tag, Loader2, RefreshCw, Bell,
 } from 'lucide-react'
 import api from '../lib/api'
 import { formatCurrency, formatDate, getInitials, timeAgo, statusColor } from '../lib/utils'
@@ -11,6 +12,34 @@ import toast from 'react-hot-toast'
 export default function CustomerProfile() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const [isSubscribing, setIsSubscribing] = useState(false)
+
+  const subscribeToPush = async () => {
+    try {
+      setIsSubscribing(true)
+      const permission = await Notification.requestPermission()
+      if (permission !== 'granted') {
+        toast.error('Notification permission denied.')
+        return
+      }
+
+      const reg = await navigator.serviceWorker.register('/sw.js')
+      await navigator.serviceWorker.ready
+
+      const subscription = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: import.meta.env.VITE_VAPID_PUBLIC_KEY || 'BPo31HAp4gnIskc441xPttK4FJUm7z6CuziGcAE3kO6l0T57brCl8obRbbolHze2Kb-Tlt6FgYZUrOYp20Zposc'
+      })
+
+      await api.post(`/customers/${id}/push-subscribe`, subscription)
+      toast.success('Browser subscribed to this customer!')
+    } catch (err: any) {
+      console.error(err)
+      toast.error('Push subscription failed: ' + err.message)
+    } finally {
+      setIsSubscribing(false)
+    }
+  }
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['customer', id],
@@ -95,6 +124,13 @@ export default function CustomerProfile() {
                   <MapPin size={14} /> {customer.city}, {customer.state}
                 </span>
               )}
+            </div>
+            <div className="flex flex-wrap gap-2 mt-4">
+              <button onClick={subscribeToPush} disabled={isSubscribing} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-80"
+                style={{ background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', border: '1px solid rgba(217, 119, 6, 0.25)' }}>
+                {isSubscribing ? <Loader2 size={12} className="animate-spin" /> : <Bell size={12} />}
+                Subscribe Browser to Push
+              </button>
             </div>
             <div className="flex flex-wrap gap-2 mt-3">
               {(customer.tags || []).map((tag: string) => (

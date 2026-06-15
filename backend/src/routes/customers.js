@@ -207,4 +207,19 @@ router.post('/:id/insights', async (req, res) => {
   }
 });
 
+// POST /api/customers/:id/push-subscribe
+router.post('/:id/push-subscribe', async (req, res) => {
+  try {
+    const customer = await Customer.findByIdAndUpdate(
+      req.params.id, 
+      { pushSubscription: req.body }, 
+      { new: true }
+    );
+    if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
+    res.json({ success: true, message: 'Push subscription saved' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;

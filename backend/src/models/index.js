@@ -31,6 +31,7 @@ const customerSchema = new mongoose.Schema({
   aiInsights: { type: String },
   dataQualityScore: { type: Number, default: 100 },
   source: { type: String, enum: ['csv', 'manual', 'api', 'shopify', 'seed'], default: 'manual' },
+  pushSubscription: { type: mongoose.Schema.Types.Mixed },
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 
