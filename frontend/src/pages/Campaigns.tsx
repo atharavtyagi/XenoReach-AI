@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   Plus, Send, Sparkles, Rocket,
-  Loader2, Mail, MessageSquare, Smartphone, Bell, Radio, BarChart3, X,
+  Loader2, Mail, Bell, BarChart3, X,
 } from 'lucide-react'
 import api from '../lib/api'
 import { formatCurrency, timeAgo, statusColor, channelIcon } from '../lib/utils'
