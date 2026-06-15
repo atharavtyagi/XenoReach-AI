@@ -23,6 +23,9 @@ if (process.env.SMTP_USER && process.env.SMTP_PASS) {
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: process.env.SMTP_PORT || 465,
     secure: process.env.SMTP_PORT == 465 || process.env.SMTP_PORT === undefined, // true for 465, false for other ports
+    pool: true,
+    maxConnections: 2,
+    maxMessages: 100,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -184,7 +187,7 @@ router.post('/', async (req, res) => {
     });
 
     communications.forEach((comm, i) => {
-      const baseDelay = (i * 200); 
+      const baseDelay = (i * 1500); // 1.5 seconds between each email to prevent Gmail rate limiting
       setTimeout(() => {
         deliverCommunication(comm, campaignId, channel, crmCallbackUrl, campaignName);
       }, baseDelay);
