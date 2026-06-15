@@ -1,35 +1,87 @@
-self.addEventListener('push', function (event) {
-  if (event.data) {
-    const data = event.data.json();
-    const title = data.title || 'New Notification';
-    const options = {
-      body: data.body || 'You have a new message.',
-      icon: data.icon || '/favicon.ico',
-      badge: '/favicon.ico',
-      data: data.url || '/'
-    };
+/* XenoReach AI — Service Worker for Web Push Notifications */
+const CACHE_NAME = 'xenoreach-v1';
 
-    event.waitUntil(
-      self.registration.showNotification(title, options)
-    );
-  }
+self.addEventListener('install', (event) => {
+  console.log('[SW] Installing XenoReach Service Worker');
+  self.skipWaiting();
 });
 
-self.addEventListener('notificationclick', function (event) {
-  event.notification.close();
+self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating XenoReach Service Worker');
+  event.waitUntil(clients.claim());
+});
+
+// Handle push events from the server
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push received:', event);
+
+  let data = {
+    title: 'XenoReach AI Campaign',
+    body: 'You have a new campaign message.',
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
+  };
+
+  if (event.data) {
+    try {
+      const parsed = event.data.json();
+      data = { ...data, ...parsed };
+    } catch (e) {
+      data.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: data.body,
+    icon: data.icon || '/favicon.ico',
+    badge: data.badge || '/favicon.ico',
+    vibrate: [100, 50, 100],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: 1,
+      url: data.url || '/',
+    },
+    actions: [
+      { action: 'view', title: 'View Campaign', icon: '/favicon.ico' },
+      { action: 'dismiss', title: 'Dismiss' },
+    ],
+    requireInteraction: false,
+    tag: 'xenoreach-campaign',
+  };
+
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then(windowClients => {
-      // Check if there is already a window/tab open with the target URL
-      for (let i = 0; i < windowClients.length; i++) {
-        const client = windowClients[i];
-        if (client.url === event.notification.data && 'focus' in client) {
-          return client.focus();
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// Handle notification click
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notification clicked:', event.action);
+  event.notification.close();
+
+  if (event.action === 'dismiss') return;
+
+  const urlToOpen = event.notification.data?.url || '/dashboard';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // Focus existing window if open
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.focus();
+          client.navigate(urlToOpen);
+          return;
         }
       }
-      // If not, open a new window
+      // Open new window
       if (clients.openWindow) {
-        return clients.openWindow(event.notification.data);
+        return clients.openWindow(urlToOpen);
       }
     })
   );
+});
+
+// Handle notification close
+self.addEventListener('notificationclose', (event) => {
+  console.log('[SW] Notification dismissed:', event.notification.tag);
 });

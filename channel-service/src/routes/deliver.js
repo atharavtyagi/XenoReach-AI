@@ -14,24 +14,40 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY || 'rUjg2UWhkoqnEp5mGATauyV0bbTITXh0d3Eru1fSwbk'
 );
 
-// Set up Nodemailer (Ethereal for testing)
+// Set up Nodemailer (Real SMTP or Ethereal for testing)
 let transporter;
-nodemailer.createTestAccount((err, account) => {
-  if (err) {
-    console.error('Failed to create a testing account. ' + err.message);
-    return;
-  }
+
+if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+  // Use real SMTP credentials
   transporter = nodemailer.createTransport({
-    host: account.smtp.host,
-    port: account.smtp.port,
-    secure: account.smtp.secure,
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: process.env.SMTP_PORT || 465,
+    secure: process.env.SMTP_PORT == 465 || process.env.SMTP_PORT === undefined, // true for 465, false for other ports
     auth: {
-      user: account.user,
-      pass: account.pass,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
-  console.log(`✉️ Nodemailer initialized with Ethereal Email: ${account.user}`);
-});
+  console.log(`✉️ Nodemailer initialized with Real SMTP for: ${process.env.SMTP_USER}`);
+} else {
+  // Fallback to Ethereal Email
+  nodemailer.createTestAccount((err, account) => {
+    if (err) {
+      console.error('Failed to create a testing account. ' + err.message);
+      return;
+    }
+    transporter = nodemailer.createTransport({
+      host: account.smtp.host,
+      port: account.smtp.port,
+      secure: account.smtp.secure,
+      auth: {
+        user: account.user,
+        pass: account.pass,
+      },
+    });
+    console.log(`✉️ Nodemailer initialized with Ethereal Email: ${account.user}`);
+  });
+}
 
 const sendCallback = async (effectiveCallbackUrl, data) => {
   try {
