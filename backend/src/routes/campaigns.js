@@ -176,11 +176,15 @@ router.post('/:id/launch', async (req, res) => {
 
     // Send to Channel Service asynchronously
     const channelUrl = process.env.CHANNEL_SERVICE_URL || 'http://localhost:5001';
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+    const host = req.get('host');
+    const autoCallbackUrl = `${protocol}://${host}/api/analytics/callback`;
+    
     const payload = {
       campaignId: campaign._id,
       campaignName: campaign.name,
       channel: campaign.channel,
-      crmCallbackUrl: process.env.CRM_CALLBACK_URL || 'http://localhost:5000/api/analytics/callback',
+      crmCallbackUrl: process.env.CRM_CALLBACK_URL || autoCallbackUrl,
       communications: communications.map((comm, i) => ({
         communicationId: comm._id,
         customerId: customers[i]._id,
@@ -192,8 +196,11 @@ router.post('/:id/launch', async (req, res) => {
     };
 
     // Fire and forget to channel service
-    axios.post(`${channelUrl}/api/deliver`, payload).catch(err => {
+    axios.post(`${channelUrl}/api/deliver`, payload).catch(async (err) => {
       console.error('Channel service error:', err.message);
+      // Mark campaign as failed if the channel service is completely unreachable
+      await Campaign.findByIdAndUpdate(campaign._id, { status: 'failed' });
+      await Communication.updateMany({ campaignId: campaign._id }, { status: 'failed', failureReason: 'Channel service unreachable (' + err.message + ')' });
     });
 
     res.json({
