@@ -15,6 +15,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+const auditLogger = require('./middleware/auditLogger');
 const authRoutes = require('./routes/auth');
 const customerRoutes = require('./routes/customers');
 const orderRoutes = require('./routes/orders');
@@ -53,6 +54,7 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(morgan('dev'));
+app.use(auditLogger); // Attach auto-logger
 
 // Basic Health Check Route for Diagnostics
 app.get('/api/health', (req, res) => {
