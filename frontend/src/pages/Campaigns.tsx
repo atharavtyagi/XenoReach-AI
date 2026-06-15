@@ -12,10 +12,7 @@ import toast from 'react-hot-toast'
 
 const CHANNEL_OPTS = [
   { value: 'Email', label: 'Email', icon: Mail, color: '#2563eb' },
-  { value: 'SMS', label: 'SMS', icon: MessageSquare, color: '#059669' },
-  { value: 'WhatsApp', label: 'WhatsApp', icon: Smartphone, color: '#10b981' },
   { value: 'Push', label: 'Push', icon: Bell, color: '#d97706' },
-  { value: 'Multi-Channel', label: 'Multi-Channel', icon: Radio, color: '#7c3aed' },
 ]
 
 export default function Campaigns() {
@@ -236,7 +233,7 @@ export default function Campaigns() {
 
                   <div>
                     <label className="block text-xs font-medium mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>Channel</label>
-                    <div className="grid grid-cols-5 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {CHANNEL_OPTS.map(({ value, label, icon: Icon, color }) => (
                         <button key={value} onClick={() => setForm(f => ({ ...f, channel: value }))}
                           className="p-2 rounded-xl text-center transition-all"
