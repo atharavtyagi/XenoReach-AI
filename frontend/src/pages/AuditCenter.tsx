@@ -57,6 +57,7 @@ export default function AuditCenter() {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['audit-logs', category, status, search, page],
     queryFn: () => api.get('/audit', { params: { category: category !== 'all' ? category : undefined, status: status !== 'all' ? status : undefined, search: search || undefined, page, limit: 30 } }).then(r => r.data),
+    refetchInterval: 3000, // Real-time polling every 3 seconds
   })
 
   const logs: any[] = data?.data || []

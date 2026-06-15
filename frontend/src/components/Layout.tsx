@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import api from '../lib/api'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Users, Tag, Send, Bot, BarChart3,
@@ -8,7 +10,7 @@ import {
   Wand2, MessageCircle, GitBranch, Target
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { getInitials } from '../lib/utils'
+import { getInitials, timeAgo } from '../lib/utils'
 
 interface NavItem { to: string; icon: React.FC<any>; label: string; badge?: string }
 interface NavGroup { label: string; items: NavItem[] }
@@ -64,11 +66,31 @@ export default function Layout({ children }: LayoutProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
 
-  const NOTIFICATIONS = [
-    { icon: '📊', text: 'Campaign \'Summer Sale\' delivered to 1,240 customers', time: '2m ago', color: '#10b981' },
-    { icon: '🎯', text: 'New AI segment \'High-Value VIPs\' created with 342 customers', time: '15m ago', color: '#a78bfa' },
-    { icon: '⚠️', text: 'Data quality score dropped to 87% — 23 records need attention', time: '1h ago', color: '#f59e0b' },
-  ]
+  const { data } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => api.get('/audit', { params: { limit: 5 } }).then(r => r.data),
+    refetchInterval: 3000, // Poll every 3 seconds
+  })
+
+  const auditLogs = data?.data || []
+  
+  const NOTIFICATIONS = auditLogs.map((log: any) => {
+    let icon = '🔔'
+    let color = '#a78bfa'
+    if (log.category === 'campaign') { icon = '📊'; color = '#10b981' }
+    else if (log.category === 'segment') { icon = '🎯'; color = '#7c3aed' }
+    else if (log.category === 'data_import') { icon = '📥'; color = '#ec4899' }
+    else if (log.status === 'failed') { icon = '⚠️'; color = '#ef4444' }
+    else if (log.category === 'ai') { icon = '✨'; color = '#8b5cf6' }
+
+    return {
+      id: log._id,
+      icon,
+      text: `${log.userName || 'System'}: ${log.action}`,
+      time: log.createdAt ? timeAgo(log.createdAt) : 'Just now',
+      color
+    }
+  })
 
   const handleLogout = () => {
     logout()
@@ -249,9 +271,12 @@ export default function Layout({ children }: LayoutProps) {
                 >
                   <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>Notifications</span>
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'rgba(124,58,237,0.2)', color: '#a78bfa', fontWeight: 700 }}>3 new</span>
+                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'rgba(124,58,237,0.2)', color: '#a78bfa', fontWeight: 700 }}>{NOTIFICATIONS.length} new</span>
                   </div>
-                  {NOTIFICATIONS.map((n, i) => (
+                  {NOTIFICATIONS.length === 0 && (
+                    <div style={{ padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>No recent activity</div>
+                  )}
+                  {NOTIFICATIONS.map((n: any, i: number) => (
                     <div key={i}
                       onClick={() => setNotifOpen(false)}
                       style={{ display: 'flex', gap: 12, padding: '14px 18px', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer', transition: 'background 0.15s' }}
