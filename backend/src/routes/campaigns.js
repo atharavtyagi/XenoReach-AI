@@ -152,8 +152,12 @@ router.post('/:id/launch', async (req, res) => {
       return res.status(400).json({ success: false, message: 'No customers in segment' });
     }
 
-    const customers = await Customer.find({ _id: { $in: segment.customerIds } })
+    const allCustomers = await Customer.find({ _id: { $in: segment.customerIds } })
       .select('name email phone preferredChannel pushSubscription').lean();
+
+    // VERCEL TIMEOUT FIX: Limit to 5 customers to ensure the serverless function completes
+    // without hitting the strict 10-second timeout limit on free cloud tiers.
+    const customers = allCustomers.slice(0, 5);
 
     // Create communication records
     const communications = await Communication.insertMany(
