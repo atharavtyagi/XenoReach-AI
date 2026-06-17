@@ -14,9 +14,43 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY || 'rUjg2UWhkoqnEp5mGATauyV0bbTITXh0d3Eru1fSwbk'
 );
 
-// REAL EMAILS DISABLED BY REQUEST
-let transporter = null;
-console.log('✉️ WARNING: Real email sending has been forcefully disabled. All campaigns will be completely simulated.');
+// Set up Nodemailer (Real SMTP or Ethereal for testing)
+let transporter;
+
+if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+  // Use real SMTP credentials
+  transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: process.env.SMTP_PORT || 465,
+    secure: process.env.SMTP_PORT == 465 || process.env.SMTP_PORT === undefined, // true for 465, false for other ports
+    pool: true,
+    maxConnections: 2,
+    maxMessages: 100,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+  console.log(`✉️ Nodemailer initialized with Real SMTP for: ${process.env.SMTP_USER}`);
+} else {
+  // Fallback to Ethereal Email
+  nodemailer.createTestAccount((err, account) => {
+    if (err) {
+      console.error('Failed to create a testing account. ' + err.message);
+      return;
+    }
+    transporter = nodemailer.createTransport({
+      host: account.smtp.host,
+      port: account.smtp.port,
+      secure: account.smtp.secure,
+      auth: {
+        user: account.user,
+        pass: account.pass,
+      },
+    });
+    console.log(`✉️ Nodemailer initialized with Ethereal Email: ${account.user}`);
+  });
+}
 
 const sendCallback = async (effectiveCallbackUrl, data) => {
   try {
