@@ -85,7 +85,7 @@ cd frontend && npm run dev
 
 ### 4. Access the Application
 
-Visit **http://localhost:5173**
+Visit **https://xenoreachai.vercel.apps**
 
 **Demo credentials (auto-seeded on first run):**
 - **Email:** `demo@xenoreach.ai`
