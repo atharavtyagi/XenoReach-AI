@@ -17,16 +17,16 @@ XenoReach AI is architected as a highly scalable **3-service microservices appli
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│                    XenoReach AI System                       │
+│                    XenoReach AI System                      │
 ├─────────────────┬─────────────────────┬─────────────────────┤
-│  Frontend       │   CRM Backend       │  Channel Service     │
-│  React + Vite   │   Node.js/Express   │  Node.js/Express     │
-│  :5173          │   :5000             │  :5001               │
-│                 │                     │                       │
-│  • 22 Pages     │   • JWT Auth        │  • Delivery sim      │
-│  • Recharts     │   • 14 API modules  │  • Event gen         │
-│  • React Query  │   • Gemini AI       │  • Async callbacks   │
-│  • Radix UI     │   • 9 Mongo Models  │                       │
+│  Frontend       │   CRM Backend       │  Channel Service    │
+│  React + Vite   │   Node.js/Express   │  Node.js/Express    │
+│  :5173          │   :5000             │  :5001              │
+│                 │                     │                     │
+│  • 22 Pages     │   • JWT Auth        │  • Delivery sim     │
+│  • Recharts     │   • 14 API modules  │  • Event gen        │
+│  • React Query  │   • Gemini AI       │  • Async callbacks  │
+│  • Radix UI     │   • 9 Mongo Models  │                     │
 └─────────────────┴─────────────────────┴─────────────────────┘
 ```
 
@@ -85,7 +85,7 @@ cd frontend && npm run dev
 
 ### 4. Access the Application
 
-Visit **https://xenoreachai.vercel.apps**
+Visit **https://xenoreachai.vercel.app**
 
 **Demo credentials (auto-seeded on first run):**
 - **Email:** `demo@xenoreach.ai`
