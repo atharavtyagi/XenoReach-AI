@@ -1,9 +1,9 @@
-# XenoReach AI — AI-Native CRM for Retail Brands
+# XenoReach AI — Enterprise AI-Native CRM for Retail Brands
 
-> **Forward Deployed Engineer Interview Project** | Full-stack, production-quality AI CRM built with React 18, Node.js, MongoDB Atlas, and Google Gemini API.
+> **Forward Deployed Engineer Interview Project** | Enterprise-grade, full-stack AI CRM built with React 19, Node.js, MongoDB Atlas, and the Google Gemini API.
 
 ![XenoReach AI](https://img.shields.io/badge/XenoReach-AI--Native%20CRM-7c3aed?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMyAxMFY3bC01IDVoMXY2bDUtNWgtMXoiLz48L3N2Zz4=)
-![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript)
 ![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb)
@@ -11,9 +11,11 @@
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture Overview
 
-```
+XenoReach AI is architected as a highly scalable **3-service microservices application**:
+
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    XenoReach AI System                       │
 ├─────────────────┬─────────────────────┬─────────────────────┤
@@ -21,46 +23,46 @@
 │  React + Vite   │   Node.js/Express   │  Node.js/Express     │
 │  :5173          │   :5000             │  :5001               │
 │                 │                     │                       │
-│  • 8 Pages      │   • JWT Auth        │  • Delivery sim      │
-│  • Recharts     │   • 8 API modules   │  • Event gen         │
-│  • Framer Motion│   • Gemini AI       │  • Async callbacks   │
-│  • React Query  │   • MongoDB         │                       │
+│  • 22 Pages     │   • JWT Auth        │  • Delivery sim      │
+│  • Recharts     │   • 14 API modules  │  • Event gen         │
+│  • React Query  │   • Gemini AI       │  • Async callbacks   │
+│  • Radix UI     │   • 9 Mongo Models  │                       │
 └─────────────────┴─────────────────────┴─────────────────────┘
 ```
 
-### Microservice Communication
+### Microservice Event Flow
 
-```
+```text
 Frontend → POST /api/campaigns/:id/launch → CRM Backend
 CRM Backend → POST /deliver → Channel Service
-Channel Service → POST /api/analytics/callback → CRM Backend (async)
-CRM Backend → Gemini API (segment gen, campaign gen, insights, copilot)
+Channel Service → POST /api/analytics/callback → CRM Backend (async webhook)
+CRM Backend ↔ Gemini API (segment generation, insights, campaign generation, copilot)
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start Guide
 
 ### Prerequisites
 - Node.js 18+ 
 - MongoDB Atlas account (free tier works)
-- Google Gemini API key (optional — demo mode works without it)
+- Google Gemini API key (optional — demo mode falls back to curated responses without it)
 
-### 1. Clone & Install
+### 1. Clone & Install Dependencies
 
 ```bash
-# Install all dependencies
+# Install dependencies across all microservices
 cd backend && npm install
 cd ../channel-service && npm install
 cd ../frontend && npm install
 ```
 
-### 2. Configure Environment
+### 2. Configure Environment Variables
 
 ```bash
-# Backend
+# CRM Backend
 cp backend/.env.example backend/.env
-# Edit: add MONGODB_URI and GEMINI_API_KEY
+# Edit .env to add MONGODB_URI and GEMINI_API_KEY
 
 # Channel Service  
 cp channel-service/.env.example channel-service/.env
@@ -68,213 +70,72 @@ cp channel-service/.env.example channel-service/.env
 
 ### 3. Run All Services
 
-Open **3 terminals** and run:
+Open **3 separate terminals** and execute:
 
 ```bash
-# Terminal 1 — CRM Backend (port 5000)
+# Terminal 1 — CRM Backend (Port 5000)
 cd backend && npm run dev
 
-# Terminal 2 — Channel Service (port 5001)
+# Terminal 2 — Channel Service (Port 5001)
 cd channel-service && npm run dev
 
-# Terminal 3 — Frontend (port 5173)
+# Terminal 3 — Frontend (Port 5173)
 cd frontend && npm run dev
 ```
 
-### 4. Open & Login
+### 4. Access the Application
 
 Visit **http://localhost:5173**
 
-Demo credentials (auto-seeded):
+**Demo credentials (auto-seeded on first run):**
 - **Email:** `demo@xenoreach.ai`
 - **Password:** `demo123`
 
-The seed script auto-runs on first start and creates:
-- 1 demo user
-- 200 realistic Indian retail customers
-- 500+ orders across cities (Mumbai, Delhi, Bangalore, Hyderabad, Chennai, Pune)
-- 8 pre-built customer segments
-- 10 sample campaigns across all channels
+*Note: The backend automatically runs a seed script on startup if the database is empty, generating 200 realistic customers, 500+ orders, campaigns, and pre-built AI segments.*
 
 ---
 
-## ✨ Features
+## ✨ Core Features
 
-### 🔐 Authentication
-- JWT-based stateless auth (7-day tokens)
-- bcrypt password hashing (12 rounds)
-- Auto-redirect on 401
+### 🏢 Enterprise Suite (New!)
+- **Workflow Builder:** Visual tool to create automated marketing workflows triggered by system events (e.g., `customer_created`, `order_placed`).
+- **Audit Center:** System-wide logging of all events for strict compliance and security monitoring.
+- **Data Quality Dashboard:** Dedicated tools for tracking database integrity, deduplication, and data hygiene.
+- **Implementation & Deployment Tracker:** AI-driven tools to assist Forward Deployed Engineers and Customer Success teams in onboarding clients and ensuring deployment readiness.
+- **Executive Insights:** High-level ROI metrics and cross-campaign reporting geared towards leadership.
 
-### 👥 Customer Hub
-- Paginated table with search (15 per page)
-- CSV drag-and-drop import (auto-upsert by email)
-- Customer 360° profile with order history
-- AI-generated insights + churn risk scoring
-- Data quality score calculation
+### 🤖 Google Gemini AI Integration
+Powered by `gemini-1.5-flash`, XenoReach features four deep AI integrations:
+1. **AI Segment Builder:** Translates natural language queries (e.g., *"High value customers inactive for 90 days"*) directly into complex MongoDB filters.
+2. **AI Campaign Generator:** Translates high-level business goals into full campaign blueprints (channel selection, subject line, personalized message).
+3. **AI Customer Insights:** Analyzes 360° customer profiles to predict churn risk and recommend next-best actions.
+4. **AI Copilot Chat:** A multi-turn conversational interface that parses intent and surfaces actionable UI buttons (e.g., "Create Segment") directly within the chat.
 
-### 🎯 AI Segment Builder
-- Natural language → MongoDB query via Gemini
-- Live preview (customer count, estimated revenue, avg spend)
-- Save and reuse segments across campaigns
-- Revenue estimation per segment
+### 👥 Customer Data Platform (CDP)
+- **Customer 360° Profiles:** Unified view of orders, lifecycle stage, AI insights, and preferred channels.
+- **CSV Bulk Import:** Drag-and-drop file ingestion using `react-dropzone` and `csv-parse`, featuring automatic email-based upserts.
+- **Simulated Integrations:** Mock connectors for Shopify, WooCommerce, Mailchimp, WhatsApp Business, ERPs, and POS systems.
 
-### 📧 AI Campaign Generator
-- Goal description → full campaign blueprint
-- AI generates: name, channel, subject, personalized message, tips
-- 5 channel types: Email, SMS, WhatsApp, Push, Multi-Channel
-- One-click launch to Channel Service
-
-### 🤖 AI Copilot Chat
-- Multi-turn conversation with Google Gemini
-- Starter prompts for quick actions
-- Action buttons: Create Segment, Create Campaign, View Analytics
-- Markdown rendering with syntax highlighting
-
-### 📊 Analytics Dashboard
-- 8 KPI cards with trend indicators
-- Customer acquisition area chart
-- Revenue by city bar chart
-- Spend distribution pie chart
-- Campaign funnel visualization
-- Radar chart for channel performance scores
-
-### 🔌 Integration Hub
-- 8 simulated integrations (Shopify, WooCommerce, POS, ERP, Mailchimp, WhatsApp, Razorpay, Google Analytics)
-- Connect/disconnect/sync simulation
-- Records synced counter
-
-### 🏛️ Architecture Page
-- Full system architecture documentation
-- 6 decision cards with tradeoffs
-- Tech stack reference
+### 📊 Analytics & Delivery Engine
+- **Dashboard:** Real-time KPI tracking via Recharts (Area, Bar, Pie, Radar, and custom Funnel charts).
+- **Channel Service:** A dedicated Node.js microservice that simulates realistic delivery funnels for Email, SMS, WhatsApp, and Push notifications, sending asynchronous webhooks back to the CRM.
 
 ---
 
-## 📡 API Reference
+## 🗄️ Database Schema Overview
 
-### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Create account |
-| POST | `/api/auth/login` | Get JWT token |
-| GET | `/api/auth/me` | Get current user |
+The application utilizes **MongoDB** with Mongoose. Key collections include:
 
-### Customers
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/customers?page=1&limit=15&search=` | List customers |
-| GET | `/api/customers/stats` | Aggregate stats |
-| GET | `/api/customers/:id` | Customer 360 profile |
-| POST | `/api/customers` | Create customer |
-| PUT | `/api/customers/:id` | Update customer |
-| DELETE | `/api/customers/:id` | Delete customer |
-| POST | `/api/customers/upload-csv` | CSV bulk import |
-| POST | `/api/customers/:id/insights` | Generate AI insights |
-
-### Segments
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/segments` | List all segments |
-| POST | `/api/segments` | Create segment |
-| POST | `/api/segments/ai-generate` | AI segment from NL query |
-| DELETE | `/api/segments/:id` | Delete segment |
-
-### Campaigns
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/campaigns` | List all campaigns |
-| POST | `/api/campaigns` | Create campaign |
-| GET | `/api/campaigns/:id/analytics` | Campaign analytics |
-| POST | `/api/campaigns/:id/launch` | Launch campaign |
-| POST | `/api/campaigns/ai-generate` | AI campaign from goal |
-
-### Analytics
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/analytics/overview` | Dashboard KPIs |
-| GET | `/api/analytics/campaigns` | Campaign performance list |
-| POST | `/api/analytics/callback` | **[Public]** Channel service callback |
-
-### Copilot
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/copilot/chat` | Send message to Gemini |
-| DELETE | `/api/copilot/session/:id` | Clear session |
-
-### Integrations
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/integrations` | List integrations |
-| POST | `/api/integrations/:id/connect` | Connect integration |
-| POST | `/api/integrations/:id/disconnect` | Disconnect |
-| POST | `/api/integrations/:id/sync` | Sync records |
-
-### Channel Service
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/deliver` | Launch campaign delivery |
-| GET | `/health` | Health check |
-
----
-
-## 🗄️ Database Schema
-
+```text
+users          — email, passwordHash (bcrypt), name, role
+customers      — name, email, phone, city, totalSpend, lastOrderDate, aiInsights, dataQualityScore
+orders         — customerId, orderNumber, totalAmount, status, items
+segments       — name, filters (AI generated), naturalLanguageQuery, customerCount
+campaigns      — name, channel, message, segmentId, stats (sent/delivered/opened/clicked/converted)
+communications — campaignId, customerId, status, timestamps (async delivery tracking)
+workflows      — trigger, actions, executionCount, isActive
+auditLogs      — action, category, userId, status, ipAddress
 ```
-users          — email, password, name, company, role
-customers      — name, email, phone, city, state, tags, totalSpend, orderCount, 
-                 lastOrderDate, preferredChannel, aiInsights, dataQualityScore
-orders         — customerId, orderNumber, totalAmount, status, channel, items
-segments       — name, description, filters, customerCount, estimatedRevenue,
-                 naturalLanguageQuery, isAiGenerated
-campaigns      — name, channel, message, subject, goal, segmentId, audienceSize,
-                 status, stats (sent/delivered/opened/clicked/converted/revenue),
-                 isAiGenerated, aiMetadata
-communications — campaignId, customerId, channel, status, timestamps, revenue
-analyticsEvents — type, campaignId, customerId, metadata, timestamp
-```
-
----
-
-## 🤖 Gemini AI Integration
-
-Four AI features powered by `gemini-1.5-flash`:
-
-### 1. Segment Generation
-```
-Input: "Show customers who spent > ₹5000 and haven't ordered in 90 days"
-Output: { filters: { totalSpend: { $gte: 5000 }, lastOrderDate: { $lte: 90daysAgo } } }
-```
-
-### 2. Campaign Generation
-```
-Input: Goal text + optional segment
-Output: { name, channel, subject, message, audienceRecommendation, expectedOutcome, tips }
-```
-
-### 3. Customer Insights
-```
-Input: Customer profile data
-Output: Behavioral analysis, churn risk, engagement opportunities, next action
-```
-
-### 4. Copilot Chat
-```
-Multi-turn conversation with CRM context
-Returns: { response (markdown), actions: [{ type, label }] }
-```
-
-**Demo Mode:** If `GEMINI_API_KEY` is not set, all AI features return realistic curated responses. The app is fully functional for demos without any API key.
-
----
-
-## 🎨 Design System
-
-- **Theme:** Dark mode, glassmorphism, purple gradient branding
-- **Font:** Inter (Google Fonts)
-- **Colors:** Violet (#7c3aed) → Fuchsia (#c026d3) primary gradient
-- **Components:** Custom CSS classes (`.glass`, `.btn-gradient`, `.metric-card`, `.shimmer`)
-- **Animations:** Framer Motion for page transitions, stagger effects
-- **Charts:** Recharts (Area, Bar, Pie, Radar, custom Funnel)
 
 ---
 
@@ -282,66 +143,19 @@ Returns: { response (markdown), actions: [{ type, label }] }
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React 18 + TypeScript + Vite 5 |
-| Styling | Tailwind CSS v4 + Custom CSS |
-| Animation | Framer Motion |
-| Charts | Recharts |
-| State | TanStack React Query v5 |
-| Routing | React Router v6 |
-| Backend | Node.js + Express.js |
-| Database | MongoDB + Mongoose |
-| Auth | JWT + bcryptjs |
-| AI | Google Gemini 1.5 Flash |
-| Upload | Multer + csv-parse |
-| Dev | Nodemon + Vite HMR |
+| **Frontend** | React 19, TypeScript, Vite 8 |
+| **Styling & UI** | Tailwind CSS v4, Custom CSS, Radix UI Primitives |
+| **State & Data** | TanStack React Query v5 |
+| **Animation & Charts** | Framer Motion, Recharts |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB Atlas, Mongoose 8 |
+| **Auth & Security** | JWT, bcryptjs, Helmet, Express Rate Limit |
+| **AI Integration** | Google Gemini 1.5 Flash SDK |
 
 ---
 
-## 🏃 Development
+## 📝 License & Contact
 
-```bash
-# Frontend linting + type check
-cd frontend && npx tsc --noEmit
-
-# Frontend production build
-cd frontend && npm run build
-
-# Backend — reset + re-seed database
-cd backend && node src/scripts/seed.js
-
-# Test API endpoints
-curl http://localhost:5000/api/auth/login \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"email":"demo@xenoreach.ai","password":"demo123"}'
-```
-
----
-
-## 🌐 Deployment Notes
-
-### Production Checklist
-- [ ] Set `NODE_ENV=production` in backend
-- [ ] Configure MongoDB Atlas Network Access (whitelist deploy IP)
-- [ ] Set strong `JWT_SECRET` (32+ random chars)
-- [ ] Enable CORS for your production frontend URL
-- [ ] Use PM2 or Railway/Render for backend hosting
-- [ ] Deploy frontend to Vercel/Netlify (static build)
-- [ ] Update `VITE_API_URL` to production backend URL
-- [ ] Remove demo seeding logic or protect with env flag
-
-### Recommended Hosting
-- **Frontend:** Vercel (zero-config Vite support)
-- **Backend:** Railway or Render (Node.js, free tier)
-- **Channel Service:** Railway (second service, free tier)
-- **Database:** MongoDB Atlas (M0 free cluster)
-
----
-
-## 📝 License
-
-Built for interview demonstration purposes. All data is synthetic.
-
----
+This project was built for interview demonstration purposes. All seeded data is purely synthetic.
 
 *Built with ❤️ by XenoReach AI — Powered by Google Gemini*
