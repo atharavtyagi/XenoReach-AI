@@ -146,29 +146,48 @@ router.post('/upload-csv', upload.single('file'), async (req, res) => {
     const customers = [];
     const errors = [];
 
+    const normalizeRow = (row) => {
+      const normalized = {};
+      for (const [key, value] of Object.entries(row)) {
+        normalized[key.toLowerCase().trim()] = value;
+      }
+      return normalized;
+    };
+
     for (let i = 0; i < records.length; i++) {
-      const row = records[i];
+      const row = normalizeRow(records[i]);
       try {
-        const existing = await Customer.findOne({ email: row.email?.toLowerCase() });
+        if (!row.email && !row.phone) {
+          throw new Error('Row must contain an email or phone number');
+        }
+
+        const email = row.email ? row.email.toLowerCase() : undefined;
+        const phone = row.phone ? row.phone.trim() : undefined;
+        
+        let existing = null;
+        if (email) existing = await Customer.findOne({ email });
+        if (!existing && phone) existing = await Customer.findOne({ phone });
+
         if (existing) {
           // Update existing customer
           await Customer.findByIdAndUpdate(existing._id, {
-            totalSpend: Number(row.totalSpend) || existing.totalSpend,
-            orderCount: Number(row.orderCount) || existing.orderCount,
+            name: row.name || existing.name,
+            totalSpend: Number(row.totalspend || row.total_spend) || existing.totalSpend,
+            orderCount: Number(row.ordercount || row.order_count) || existing.orderCount,
           });
-          customers.push({ updated: true, email: row.email });
+          customers.push({ updated: true, email: existing.email });
         } else {
           const c = await Customer.create({
-            name: row.name || row.Name,
-            email: row.email || row.Email,
-            phone: row.phone || row.Phone,
-            city: row.city || row.City,
-            state: row.state || row.State,
-            gender: row.gender || row.Gender,
+            name: row.name || 'Unknown',
+            email: email,
+            phone: phone,
+            city: row.city,
+            state: row.state,
+            gender: row.gender,
             age: Number(row.age) || undefined,
-            totalSpend: Number(row.totalSpend || row.total_spend) || 0,
-            orderCount: Number(row.orderCount || row.order_count) || 0,
-            lastOrderDate: row.lastOrderDate ? new Date(row.lastOrderDate) : undefined,
+            totalSpend: Number(row.totalspend || row.total_spend) || 0,
+            orderCount: Number(row.ordercount || row.order_count) || 0,
+            lastOrderDate: row.lastorderdate || row.last_order_date ? new Date(row.lastorderdate || row.last_order_date) : undefined,
             tags: row.tags ? row.tags.split(',').map(t => t.trim()) : [],
             source: 'csv',
           });
