@@ -11,23 +11,18 @@ router.use(authenticate);
 router.post('/generate', async (req, res) => {
   try {
     const {
-      problem,          // e.g. "High customer churn in Tier-2 cities"
-      businessType,     // e.g. "fashion retail"
-      currentMetrics,   // optional: current KPIs
-      goals,            // optional: desired outcomes
-      constraints,      // optional: budget, team size, timeline
+      businessType,
+      customerCount,
+      monthlyOrders,
+      challenges,
+      problem // legacy fallback
     } = req.body;
 
-    if (!problem) {
-      return res.status(400).json({ success: false, message: 'problem is required' });
-    }
-
     const context = {
-      problem,
       businessType: businessType || 'Indian retail',
-      currentMetrics: currentMetrics || {},
-      goals: goals || [],
-      constraints: constraints || {},
+      customerCount: customerCount || 0,
+      monthlyOrders: monthlyOrders || 0,
+      challenges: challenges || problem || 'General CRM implementation',
     };
 
     const recommendations = await generateSolutionRecommendations(context);
